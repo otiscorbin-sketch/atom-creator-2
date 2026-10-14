@@ -1,0 +1,249 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atom Creator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+
+    body {
+      background: #0a0a1a;
+      color: #e0e0ff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+
+    h1 {
+      font-size: 2.4rem;
+      margin: 20px 0 10px;
+      background: linear-gradient(90deg, #00ffcc, #00aaff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: center;
+    }
+
+
+    .subtitle {
+      color: #8888aa;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 40px;
+      justify-content: center;
+      max-width: 1100px;
+      width: 100%;
+    }
+
+
+    .controls {
+      background: #12122a;
+      border-radius: 20px;
+      padding: 30px;
+      width: 320px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      border: 1px solid #2a2a4a;
+    }
+
+
+    .control-group {
+      margin-bottom: 22px;
+    }
+
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #aaccff;
+    }
+
+
+    input[type="number"] {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 2px solid #333355;
+      background: #1a1a33;
+      color: white;
+      font-size: 1.1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+
+    input[type="number"]:focus {
+      border-color: #00ccff;
+    }
+
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #00ccaa, #0088ff);
+      color: white;
+      font-size: 1.15rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      margin-top: 10px;
+    }
+
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 200, 255, 0.3);
+    }
+
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+
+    .info {
+      margin-top: 25px;
+      padding: 18px;
+      background: #1a1a33;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+
+    .info strong {
+      color: #00ffcc;
+    }
+
+
+    .canvas-container {
+      background: #12122a;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      border: 1px solid #2a2a4a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+
+    canvas {
+      border-radius: 12px;
+      background: #0a0a1a;
+    }
+
+
+    .element-name {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin: 15px 0 5px;
+      color: #00ffcc;
+    }
+
+
+    .charge {
+      font-size: 1.1rem;
+      color: #ffaa00;
+      margin-bottom: 10px;
+    }
+
+
+    footer {
+      margin-top: 40px;
+      color: #555577;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>⚛️ Atom Creator</h1>
+  <p class="subtitle">Build any atom • Bohr model visualization</p>
+
+
+  <div class="container">
+    <!-- Controls -->
+    <div class="controls">
+      <div class="control-group">
+        <label for="protons">Protons (Atomic Number)</label>
+        <input type="number" id="protons" min="1" max="118" value="6">
+      </div>
+
+
+      <div class="control-group">
+        <label for="neutrons">Neutrons</label>
+        <input type="number" id="neutrons" min="0" max="200" value="6">
+      </div>
+
+
+      <div class="control-group">
+        <label for="electrons">Electrons</label>
+        <input type="number" id="electrons" min="0" max="200" value="6">
+      </div>
+
+
+      <button class="btn" onclick="createAtom()">Create Atom</button>
+
+
+      <div class="info" id="info">
+        Enter values and click <strong>Create Atom</strong>
+      </div>
+    </div>
+
+
+    <!-- Visualization -->
+    <div class="canvas-container">
+      <canvas id="atomCanvas" width="500" height="500"></canvas>
+      <div class="element-name" id="elementName">Carbon</div>
+      <div class="charge" id="chargeInfo">Neutral atom</div>
+    </div>
+  </div>
+
+
+  <footer>Made with ❤️ • Pure HTML + Canvas</footer>
+
+
+  <script>
+    // Periodic table (first 40 elements)
+    const ELEMENTS = {
+      1: "Hydrogen", 2: "Helium", 3: "Lithium", 4: "Beryllium", 5: "Boron",
+      6: "Carbon", 7: "Nitrogen", 8: "Oxygen", 9: "Fluorine", 10: "Neon",
+      11: "Sodium", 12: "Magnesium", 13: "Aluminum", 14: "Silicon", 15: "Phosphorus",
+      16: "Sulfur", 17: "Chlorine", 18: "Argon", 19: "Potassium", 20: "Calcium",
+      21: "Scandium", 22: "Titanium", 23: "Vanadium", 24: "Chromium", 25: "Manganese",
+      26: "Iron", 27: "Cobalt", 28: "Nickel", 29: "Copper", 30: "Zinc",
+      31: "Gallium", 32: "Germanium", 33: "Arsenic", 34: "Selenium", 35: "Bromine",
+      36: "Krypton", 37: "Rubidium", 38: "Strontium", 39: "Yttrium", 40: "Zirconium"
+    };
+
+
+    const canvas = document.getElementById('atomCanvas');
+    const ctx = canvas.getContext('2d');
+
+
+    function getElementName(protons) {
+      return ELEMENTS[protons] || `Element ${protons}`;
+    }
+
+
+    function createAtom() {
+      const protons = parseInt(document.getElementById('protons').value) || 1;
+      const neutrons = parseInt(document.getElementById('neutrons').value) || 0;
+      const electrons =
